@@ -7,6 +7,7 @@ import socketserver
 import socket
 import pyqrcode
 import os
+import random
 
 win = pyglet.window.Window(resizable=True)
 display = pyglet.canvas.Display()
@@ -18,6 +19,7 @@ paddlePositions = [0, 0]
 ballDirection = ""
 ballCoords = [int(screenSize[0]/2), int(screenSize[1]/2)]
 ballAngle = 0
+speed = 1.0
 
 html = """
 <html>
@@ -103,40 +105,44 @@ class getController(http.server.SimpleHTTPRequestHandler):
 
 
 def scanBall(a):
-    global ballCoords, paddlePositions, ballDirection, ballAngle
-    if (10 <= int(ballCoords[0]) <= 40) and (paddlePositions[0] <= int(ballCoords[1]) <= paddlePositions[0]+200):
+    global ballCoords, paddlePositions, ballDirection, ballAngle, speed
+    if (10 <= int(ballCoords[0]) <= 40) and (paddlePositions[0] <= int(ballCoords[1]) <= paddlePositions[0]+200*(2-speed)):
         print("hitL")
         ballDirection = "R"
-        ballAngle = abs(paddlePositions[0]+100-ballCoords[0]) / 50000
+        ballAngle = abs(paddlePositions[0]+100-ballCoords[0]) / random.randint(45000,55000)
+        speed += 0.05
         if paddlePositions[0] + 100 > ballCoords[1]:
             ballAngle = -ballAngle
-    elif (screenSize[0]-40 <= int(ballCoords[0]) <= screenSize[0] - 10) and (paddlePositions[1] <= int(ballCoords[1]) <= paddlePositions[1]+200):
+    elif (screenSize[0]-40 <= int(ballCoords[0]) <= screenSize[0] - 10) and (paddlePositions[1] <= int(ballCoords[1]) <= paddlePositions[1]+200*(2-speed)):
         print("hitR")
         ballDirection = "L"
-        ballAngle = abs(paddlePositions[1] + 100 - ballCoords[0]) / 50000
+        ballAngle = abs(paddlePositions[1] + 100 - ballCoords[0]) / random.randint(45000,55000)
+        speed += 0.05
         if paddlePositions[1] + 100 > ballCoords[1]:
             ballAngle = -ballAngle
-    elif (10 <= int(ballCoords[0]) <= 40) and not (paddlePositions[0] <= int(ballCoords[1]) <= paddlePositions[0]+200):
+    elif (10 <= int(ballCoords[0]) <= 40) and not (paddlePositions[0] <= int(ballCoords[1]) <= paddlePositions[0]+200*(2-speed)):
         print("goalL")
         ballDirection = ""
         ballCoords = [int(screenSize[0] / 2), int(screenSize[1] / 2)]
         ballAngle = 0
-    elif (screenSize[0]-40 <= int(ballCoords[0]) <= screenSize[0] - 10) and not (paddlePositions[1] <= int(ballCoords[1]) <= paddlePositions[1]+200):
+        speed = 1.0
+    elif (screenSize[0]-40 <= int(ballCoords[0]) <= screenSize[0] - 10) and not (paddlePositions[1] <= int(ballCoords[1]) <= paddlePositions[1]+200*(2-speed)):
         print("goalR")
         ballDirection = ""
         ballCoords = [int(screenSize[0] / 2), int(screenSize[1] / 2)]
         ballAngle = 0
+        speed = 1.0
     elif ballCoords[1] > screenSize[1] or ballCoords[1] < 0:
         ballAngle = - ballAngle
 
 
 def moveBall():
-    global ballDirection, ballAngle, ballCoords
+    global ballDirection, ballAngle, ballCoords, speed
     if ballDirection == "L":
-        ballCoords[0] -= 10
+        ballCoords[0] -= 10*speed
         ballCoords[1] = ballCoords[1]+ballCoords[0]*ballAngle
     elif ballDirection == "R":
-        ballCoords[0] += 10
+        ballCoords[0] += 10*speed
         ballCoords[1] = ballCoords[1]+ballCoords[0]*ballAngle
 
 
@@ -158,17 +164,17 @@ def drawPaddles():
     pyglet.graphics.draw_indexed(4, pyglet.gl.GL_TRIANGLES,
                                  [0, 1, 2, 0, 2, 3],
                                  ('v2i', (10, int(paddlePositions[0]),
-                                          10, int(paddlePositions[0]+200),
-                                          40, int(paddlePositions[0]+200),
+                                          10, int(paddlePositions[0]+200*(2-speed)),
+                                          40, int(paddlePositions[0]+200*(2-speed)),
                                           40, int(paddlePositions[0])))
                                  )
     pyglet.graphics.draw_indexed(4, pyglet.gl.GL_TRIANGLES,
                                  [0, 1, 2, 0, 2, 3],
                                  ('v2i', (screenSize[0]-10, int(paddlePositions[1]),
                                           screenSize[0] -
-                                          10, int(paddlePositions[1]+200),
+                                          10, int(paddlePositions[1]+200*(2-speed)),
                                           screenSize[0] -
-                                          40, int(paddlePositions[1]+200),
+                                          40, int(paddlePositions[1]+200*(2-speed)),
                                           screenSize[0]-40, int(paddlePositions[1])))
                                  )
 
