@@ -122,13 +122,13 @@ def scanBall(a):
             ballAngle = -ballAngle
     elif (10 <= int(ballCoords[0]) <= 40) and not (paddlePositions[0] <= int(ballCoords[1]) <= paddlePositions[0]+200*(2-speed)):
         print("goalL")
-        ballDirection = ""
+        ballDirection = "L"
         ballCoords = [int(screenSize[0] / 2), int(screenSize[1] / 2)]
         ballAngle = 0
         speed = 1.0
     elif (screenSize[0]-40 <= int(ballCoords[0]) <= screenSize[0] - 10) and not (paddlePositions[1] <= int(ballCoords[1]) <= paddlePositions[1]+200*(2-speed)):
         print("goalR")
-        ballDirection = ""
+        ballDirection = "R"
         ballCoords = [int(screenSize[0] / 2), int(screenSize[1] / 2)]
         ballAngle = 0
         speed = 1.0
